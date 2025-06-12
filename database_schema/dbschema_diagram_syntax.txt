@@ -1,0 +1,32 @@
+Designed with dbdiagram.io
+
+enum form_elements {
+  text_element
+  text_input
+  number_input_element
+  dropdown_element
+}
+
+Table admins {
+  id integer [primary key]
+  username varchar
+  hashed_password varchar
+}
+
+Table users {
+  id integer [primary key]
+  username varchar
+  hashed_password varchar
+}
+
+Table form_item {
+  id integer [primary key]
+  form_element form_elements
+  form_value varchar
+}
+
+Table form {
+  id integer [primary key]
+  form_items form_item_array
+  form_response varchar_array
+}
