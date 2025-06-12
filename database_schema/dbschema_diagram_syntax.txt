@@ -1,10 +1,10 @@
 Designed with dbdiagram.io
 
-enum form_elements {
-  text_element
+enum input_type {
+  text_label
   text_input
-  number_input_element
-  dropdown_element
+  number_input
+  dropdown_input
 }
 
 Table admins {
@@ -19,14 +19,23 @@ Table users {
   hashed_password varchar
 }
 
-Table form_item {
+Table form_items {
   id integer [primary key]
-  form_element form_elements
-  form_value varchar
+  form_id integer
+  input_type input_type
+  form_item_value varchar
+  form_item_response varchar
+  form_item_user integer
 }
 
-Table form {
+Table forms {
   id integer [primary key]
-  form_items form_item_array
-  form_response varchar_array
+  admin_id integer
+  path varchar
 }
+
+Ref: "forms"."id" < "form_items"."form_id"
+
+Ref: "users"."id" < "form_items"."form_item_user"
+
+Ref: "admins"."id" < "forms"."admin_id"

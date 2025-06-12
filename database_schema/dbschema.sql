@@ -1,8 +1,8 @@
-CREATE TYPE "form_elements" AS ENUM (
-  'text_element',
+CREATE TYPE "input_type" AS ENUM (
+  'text_label',
   'text_input',
-  'number_input_element',
-  'dropdown_element'
+  'number_input',
+  'dropdown_input'
 );
 
 CREATE TABLE "admins" (
@@ -17,15 +17,24 @@ CREATE TABLE "users" (
   "hashed_password" varchar
 );
 
-CREATE TABLE "form_item" (
+CREATE TABLE "form_items" (
   "id" integer PRIMARY KEY,
-  "form_element" form_elements,
-  "form_value" varchar
+  "form_id" integer,
+  "input_type" input_type,
+  "form_item_value" varchar,
+  "form_item_response" varchar,
+  "form_item_user" integer
 );
 
-CREATE TABLE "form" (
-  "admin_id" integer FOREIGN KEY
+CREATE TABLE "forms" (
   "id" integer PRIMARY KEY,
-  "form_item_ids" integer FOREIGN KEY [],
-  "form_response" varchar []
+  "admin_id" integer,
+  "path" varchar
 );
+
+ALTER TABLE "form_items" ADD FOREIGN KEY ("form_id") REFERENCES "forms" ("id");
+
+ALTER TABLE "form_items" ADD FOREIGN KEY ("form_item_user") REFERENCES "users" ("id");
+
+ALTER TABLE "forms" ADD FOREIGN KEY ("admin_id") REFERENCES "admins" ("id");
+
