@@ -28,6 +28,7 @@ CREATE TABLE "form_items" (
 
 CREATE TABLE "forms" (
   "id" SERIAL PRIMARY KEY,
+  "name" varchar,
   "admin_id" integer,
   "path" varchar
 );
