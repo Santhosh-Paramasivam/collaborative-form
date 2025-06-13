@@ -7,6 +7,7 @@ const supabase = require('@supabase/supabase-js')
 const dotenv = require('dotenv')
 
 const generateSHA256 = require('./secure_hash')
+const { table } = require('console')
 
 dotenv.config()
 
@@ -33,9 +34,24 @@ app.post('/register', async (req, res) => {
         res.status(400).send({ 'missing-field': '"password" field is missing' })
         return
     }
+    if (!util('role', Object.keys(req.body))) {
+        res.status(400).send({ 'missing-field': '"role" field is missing' })
+        return
+    }
 
     const hashed_password = generateSHA256(req.body.password)
-    const { error } = await client.from('admins').insert({ 'username': req.body.username, 'hashed_password': hashed_password })
+
+    const table_name = req.body.role + 's'
+
+    const { error } = await client.from(table_name).insert({ 'username': req.body.username, 'hashed_password': hashed_password })
+
+    if (error && error.code == "23505") {
+        res.status(400).send({ "Bad Request": "Username already exists" })
+        return
+    }
+    if (error) {
+        res.status(500).send({ "Interal Server Error": error })
+    }
 
     res.status(200).send({ "Success": "User registered" })
 })
