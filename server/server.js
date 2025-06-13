@@ -1,14 +1,17 @@
+// REMEMBER TO SET AN EXPIRY DATE FOR THE JWT TOKEN
+
 const { urlencoded } = require('body-parser')
 const express = require('express')
 const http = require('http')
 const socketIO = require('socket.io')
-const findInList = require('./findInList')
 const supabase = require('@supabase/supabase-js')
 const dotenv = require('dotenv')
-const generateSHA256 = require('./secure_hash')
 const jwt = require('jsonwebtoken')
 
-const { table } = require('console')
+
+const generateSHA256 = require('./secure_hash')
+const findInList = require('./find_in_list')
+const required_field_missing = require('./required_field_missing')
 
 dotenv.config()
 
@@ -28,18 +31,7 @@ app.use(express.json())
 app.use(urlencoded({ extended: true }))
 
 app.post('/register', async (req, res) => {
-    if (!findInList('username', Object.keys(req.body))) {
-        res.status(400).send({ 'missing-field': '"username" field is missing' })
-        return
-    }
-    if (!findInList('password', Object.keys(req.body))) {
-        res.status(400).send({ 'missing-field': '"password" field is missing' })
-        return
-    }
-    if (!findInList('role', Object.keys(req.body))) {
-        res.status(400).send({ 'missing-field': '"role" field is missing' })
-        return
-    }
+    const required_fields = ['username', 'password', 'role']
 
     const hashed_password = generateSHA256(req.body.password)
 
@@ -59,18 +51,9 @@ app.post('/register', async (req, res) => {
 })
 
 app.get('/login', async (req, res) => {
-    if (!findInList('username', Object.keys(req.body))) {
-        res.status(400).send({ 'missing-field': '"username" field is missing' })
-        return
-    }
-    if (!findInList('password', Object.keys(req.body))) {
-        res.status(400).send({ 'missing-field': '"password" field is missing' })
-        return
-    }
-    if (!findInList('role', Object.keys(req.body))) {
-        res.status(400).send({ 'missing-field': '"role" field is missing' })
-        return
-    }
+    const required_fields = ['username', 'password', 'role']
+
+    if (required_field_missing(required_fields, req.body, res)) return
 
     const table = req.body.role + 's'
 
@@ -92,6 +75,37 @@ app.get('/login', async (req, res) => {
     }, secretKey, { algorithm: 'HS256' })
 
     res.status(201).send({ "Sucess": "User logged in successfully", "token": token })
+})
+
+app.post('/create_form', (req, res) => {
+    if (!req.headers.authorization) {
+        console.log(req.headers.authorization)
+        res.status(401).send({ "Unauthorized": "Authorization header missing" })
+        return
+    }
+
+    const token = req.headers.authorization.trim().slice(7)
+
+    if (!token) {
+        res.status(401).send({ "Unauthorized": "JWT token missing" })
+        return
+    }
+
+    let decodedObject
+    try {
+        decodedObject = jwt.verify(token, secretKey, { complete: true })
+    } catch {
+        res.status(401).send({ "Unauthorized": "JWT token malformed" })
+        return
+    }
+
+    if (decodedObject.role != 'admin') {
+        res.status(401).send({ "Unauthorized": "Permission Denied" })
+        return
+    }
+
+    const { data, error } = client.from('forms').insert({})
+
 })
 
 server.listen(port, () => {
