@@ -6,19 +6,19 @@ CREATE TYPE "input_type" AS ENUM (
 );
 
 CREATE TABLE "admins" (
-  "id" integer PRIMARY KEY,
-  "username" varchar,
+  "id" SERIAL PRIMARY KEY,
+  "username" varchar UNIQUE,
   "hashed_password" varchar
 );
 
 CREATE TABLE "users" (
-  "id" integer PRIMARY KEY,
-  "username" varchar,
+  "id" SERIAL PRIMARY KEY,
+  "username" varchar UNIQUE,
   "hashed_password" varchar
 );
 
 CREATE TABLE "form_items" (
-  "id" integer PRIMARY KEY,
+  "id" SERIAL PRIMARY KEY,
   "form_id" integer,
   "input_type" input_type,
   "form_item_value" varchar,
@@ -27,7 +27,7 @@ CREATE TABLE "form_items" (
 );
 
 CREATE TABLE "forms" (
-  "id" integer PRIMARY KEY,
+  "id" SERIAL PRIMARY KEY,
   "admin_id" integer,
   "path" varchar
 );
