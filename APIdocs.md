@@ -92,3 +92,54 @@ Successful Response :
     "form_id": 4
 }
 ```
+
+## Get Form
+
+| Endpoint | HTTP Method | Authentication | Role | Response |
+|---|---|---|---|---|
+|/get_form|GET|JSON Web Token|Admin only| Request Status |
+
+Request Headers:
+
+``` json
+{
+"Content-Type": "application/json",
+"Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzQ5ODI0MDU4LCJleHAiOjE3NDk4MzEyNTh9.40YYMXjkrMguiOEx917ZNUkwlHY3fmTksuzY6zfcNQU"
+}
+```
+
+Payload:
+
+``` json
+{
+    "form_id":1
+}
+```
+
+Successful Response :
+
+``` json
+{
+    "form_name": "form_name",
+    "form_items": [
+        {
+            "input_type": "text_label",
+            "form_item_value": "Why are you taking this test",
+            "form_item_response": "NULL",
+            "form_item_user": 0
+        },
+        {
+            "input_type": "text_input",
+            "form_item_value": "Enter your name",
+            "form_item_response": "NULL",
+            "form_item_user": 0
+        },
+        {
+            "input_type": "dropdown_button",
+            "form_item_value": "[\"Male\",\"Female\"]",
+            "form_item_response": "NULL",
+            "form_item_user": 0
+        }
+    ]
+}
+```
