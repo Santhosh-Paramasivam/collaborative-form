@@ -7,7 +7,6 @@ const supabase = require('@supabase/supabase-js')
 const dotenv = require('dotenv')
 const jwt = require('jsonwebtoken')
 
-
 const generateSHA256 = require('./secure_hash')
 const required_field_missing = require('./required_field_missing')
 const authenticate = require('./authenticate')
@@ -182,7 +181,7 @@ app.get('/get_form', async (req, res) => {
     console.log(data)
     let form_name = data[0].name
 
-    var { data, error } = await client.from('form_items').select().eq('form_id', req.query.form_id)
+    var { data, error } = await client.from('form_items').select().eq('form_id', req.query.form_id).order('id', { ascending: true })
 
     if (error) {
         console.log(error)
@@ -260,7 +259,7 @@ app.get('/get_form_by_path', async (req, res) => {
     let form_name = data[0].name
     let form_id = data[0].id
 
-    var { data, error } = await client.from('form_items').select().eq('form_id', form_id)
+    var { data, error } = await client.from('form_items').select().eq('form_id', form_id).order('id', { ascending: true })
 
     if (error) {
         console.log(error)
@@ -293,13 +292,42 @@ app.get('/get_form_by_path', async (req, res) => {
     res.status(200).send(form_data)
 })
 
-io.on("connect", (socket) => {
-    socket.emit('locked', { form_element_id: 0 })
+const lockedFields = new Map();
+
+io.on('connection', (socket) => {
+    console.log("Socket connected:", socket.id);
+
+    socket.on('lock', ({ form_element_id }) => {
+        if (!lockedFields.has(form_element_id)) {
+            lockedFields.set(form_element_id, socket.id);
+            socket.broadcast.emit('locked', { form_element_id });
+        }
+    });
+
+    socket.on('unlock', async ({ form_element_id, jwtToken, response }) => {
+        if (lockedFields.get(form_element_id) === socket.id) {
+            lockedFields.delete(form_element_id);
+            io.emit('unlocked', { form_element_id });
+        }
+
+        const decodedObject = jwt.verify(jwtToken, secretKey)
+
+        if (!decodedObject) return
+
+        const { data, error } = await client.from('form_items').update({ "form_item_response": response, "form_item_user": decodedObject.id }).eq('id', form_element_id)
+    });
 
     socket.on('disconnect', () => {
-        console.log('User disconnected');
+        console.log("Socket disconnected:", socket.id);
+        for (let [key, val] of lockedFields.entries()) {
+            if (val === socket.id) {
+                lockedFields.delete(key);
+                io.emit('unlocked', { form_element_id: key });
+            }
+        }
     });
-})
+});
+
 
 server.listen(port, () => {
     console.log(`SERVER STARTED ON ${port}`)

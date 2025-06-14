@@ -25,10 +25,10 @@ function ViewFormResponses() {
                 return <p className='fs-4' key={form_item.input_type + form_item.form_item_value}>{JSON.parse(form_item.form_item_value)[0]}</p>
             }
             if (form_item.input_type == 'text_input') {
-                return <input key={form_item.input_type + form_item.form_item_value} className='form-control' placeholder={JSON.parse(form_item.form_item_value)} />
+                return <input key={form_item.input_type + form_item.form_item_value} className='form-control' placeholder={JSON.parse(form_item.form_item_value)} value={form_item.form_item_response} />
             }
             if (form_item.input_type == 'dropdown_input') {
-                return <select className='form-select' key={form_item.input_type + form_item.form_item_value}>
+                return <select className='form-select' key={form_item.input_type + form_item.form_item_value} value={form_item.form_item_response}>
                     {String(JSON.parse(form_item.form_item_value)).split(',').map((value) => { return <option value={value}>{value}</option> })}
                 </select>
             }

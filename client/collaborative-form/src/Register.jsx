@@ -1,4 +1,5 @@
 import './Register.css'
+import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import axios from 'axios'
 
@@ -6,6 +7,7 @@ function Register() {
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const [role, setRole] = useState('admin')
+    const navigate = useNavigate()
     const serverUrl = import.meta.env.VITE_serverUrl
 
     function register() {
@@ -28,6 +30,7 @@ function Register() {
                 alert(`${Object.entries(data.data)}`)
                 setUsername('')
                 setPassword('')
+                navigate('/login')
             })
             .catch((error) => {
                 console.log(error)

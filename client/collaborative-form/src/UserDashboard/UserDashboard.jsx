@@ -6,9 +6,9 @@ import { io } from 'socket.io-client';
 function UserDashboard() {
     const [formName, setFormName] = useState('');
     const [formElements, setFormElements] = useState([]);
-    const { form_path } = useParams();
     const [lockedElements, setLockedElements] = useState({});
-
+    const [responses, setResponses] = useState({});
+    const { form_path } = useParams();
     const socketRef = useRef(null);
 
     useEffect(() => {
@@ -36,10 +36,6 @@ function UserDashboard() {
         });
 
         return () => {
-            socketRef.current.off('connect');
-            socketRef.current.off('locked');
-            socketRef.current.off('unlocked');
-            socketRef.current.off('disconnect');
             socketRef.current.disconnect();
         };
     }, []);
@@ -54,11 +50,15 @@ function UserDashboard() {
             })
             .then((data) => {
                 setFormElements(data.data.form_items);
+
                 const lockedState = {};
+                const initialResponses = {};
                 for (let form_item of data.data.form_items) {
                     lockedState[form_item.id] = false;
+                    initialResponses[form_item.id] = '';
                 }
                 setLockedElements(lockedState);
+                setResponses(initialResponses);
                 setFormName(data.data.form_name);
             })
             .catch((error) => console.log(error));
@@ -72,8 +72,14 @@ function UserDashboard() {
         socketRef.current.emit('lock', { form_element_id: id });
     }
 
-    function handleBlur(id) {
-        socketRef.current.emit('unlock', { form_element_id: id });
+    function handleBlur(e, id) {
+        const jwtToken = sessionStorage.getItem("jwtToken");
+        const response = e.target.value;
+        socketRef.current.emit('unlock', { form_element_id: id, jwtToken, response });
+    }
+
+    function handleChange(id, value) {
+        setResponses((prev) => ({ ...prev, [id]: value }));
     }
 
     return (
@@ -88,6 +94,7 @@ function UserDashboard() {
                 {formElements && formElements.map((form_item) => {
                     const isLocked = lockedElements[form_item.id];
                     const color = isLocked ? ' border-2 border-danger' : '';
+                    const value = responses[form_item.id] || '';
 
                     if (form_item.input_type === 'text_label') {
                         return (
@@ -101,10 +108,13 @@ function UserDashboard() {
                         return (
                             <input
                                 key={form_item.id}
+                                data-form-id={form_item.id}
                                 className={'form-control' + color}
                                 placeholder={JSON.parse(form_item.form_item_value)}
+                                value={value}
+                                onChange={(e) => handleChange(form_item.id, e.target.value)}
                                 onFocus={() => handleFocus(form_item.id)}
-                                onBlur={() => handleBlur(form_item.id)}
+                                onBlur={(e) => handleBlur(e, form_item.id)}
                                 disabled={isLocked}
                             />
                         );
@@ -113,16 +123,19 @@ function UserDashboard() {
                     if (form_item.input_type === 'dropdown_input') {
                         return (
                             <select
-                                className={'form-select' + color}
                                 key={form_item.id}
+                                data-form-id={form_item.id}
+                                className={'form-select' + color}
+                                value={value}
+                                onChange={(e) => handleChange(form_item.id, e.target.value)}
                                 onFocus={() => handleFocus(form_item.id)}
-                                onBlur={() => handleBlur(form_item.id)}
+                                onBlur={(e) => handleBlur(e, form_item.id)}
                                 disabled={isLocked}
                             >
                                 {String(JSON.parse(form_item.form_item_value))
                                     .split(',')
-                                    .map((value, idx) => (
-                                        <option key={idx} value={value}>{value}</option>
+                                    .map((val, idx) => (
+                                        <option key={idx} value={val}>{val}</option>
                                     ))}
                             </select>
                         );
@@ -136,3 +149,4 @@ function UserDashboard() {
 }
 
 export default UserDashboard;
+

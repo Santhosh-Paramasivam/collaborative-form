@@ -1,4 +1,5 @@
 import './Register.css'
+import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import axios from 'axios'
 
@@ -6,6 +7,7 @@ function Login() {
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const [role, setRole] = useState('admin')
+    const navigate = useNavigate()
     const serverUrl = import.meta.env.VITE_serverUrl
 
     function login() {
@@ -32,6 +34,7 @@ function Login() {
                 let jwtToken = data.data.token
                 console.log(jwtToken)
                 sessionStorage.setItem('jwtToken', jwtToken);
+                navigate(`/${role}_dashboard`)
             })
             .catch((error) => console.log(error))
     }

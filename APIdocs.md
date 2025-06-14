@@ -200,3 +200,43 @@ Successful Response :
     {"id":1,"name":"SRM Placement","admin_id":1,"path":"123asd123"},
     {"id":4,"name":"SRM2","admin_id":1,"path":"958ed2ac"}
 ]
+```
+
+## Get Form By Path
+
+| Endpoint | HTTP Method | Authentication | Role | Response |
+|---|---|---|---|---|
+|/get_form_by_path|GET|JSON Web Token| Users and Admin | Form Details |
+
+Request Headers:
+
+``` json
+{
+"Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzQ5ODI0MDU4LCJleHAiOjE3NDk4MzEyNTh9.40YYMXjkrMguiOEx917ZNUkwlHY3fmTksuzY6zfcNQU"
+}
+```
+
+Url (with query parameters) :
+
+```http
+localhost:8080/get_form_by_path?form_path=8c5d4e3233
+```
+
+Payload:
+
+None
+
+Successful Response :
+
+``` json
+{
+    "form_name":"BasicForm",
+    "form_items":
+    [
+        {"id":11,"input_type":"text_label","form_item_value":"[\"Name\"]","form_item_response":"NULL","form_item_user":0},
+        {"id":12,"input_type":"text_label","form_item_value":"[\"Gender\"]","form_item_response":"NULL","form_item_user":0},
+        {"id":13,"input_type":"dropdown_input","form_item_value":"[\"Male,Female\"]","form_item_response":"NULL","form_item_user":0},
+        {"id":14,"input_type":"text_input","form_item_value":"[\"Enter your name\"]","form_item_response":"NULL","form_item_user":0}
+    ]
+}
+```

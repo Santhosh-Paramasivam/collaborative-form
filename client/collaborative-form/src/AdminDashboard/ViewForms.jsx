@@ -8,7 +8,6 @@ function ViewForms({formList}) {
             <div className="col-4 border-end"><p className="fs-5">Form Link</p></div>
         </div>
         {formList && formList.map((form) => { return <FormDetails key={form.id} form_id={form.id} form_name={form.name} form_path={form.path} /> })}
-        {/* <FormDetails form_id="1" form_name="SRM Placement" form_path="asdsadwdsads"></FormDetails> */}
     </div>
 }
 
