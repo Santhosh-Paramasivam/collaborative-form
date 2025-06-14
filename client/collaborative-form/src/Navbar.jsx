@@ -1,3 +1,5 @@
+import { Link, NavLink } from "react-router-dom"
+
 function Navbar() {
     return <nav className="navbar bg-dark navbar-expand-md py-0" data-bs-theme="dark">
         <div className="container-fluid bg-body-dark bg-dark">
@@ -7,8 +9,22 @@ function Navbar() {
             </button>
             <div className="collapse navbar-collapse" id="nav-nav">
                 <div className="navbar-nav">
-                    <a className="nav-link active h4" href="#">Register</a>
-                    <a className="nav-link h4" href='#'>Login</a>
+                    <NavLink
+                        to="/"
+                        className={({ isActive }) =>
+                            isActive ? "active nav-link" : "nav-link"
+                        }
+                    >
+                        Register
+                    </NavLink>
+                    <NavLink
+                        to="/login"
+                        className={({ isActive }) =>
+                            isActive ? "active nav-link" : "nav-link"
+                        }
+                    >
+                        Login
+                    </NavLink>
                 </div>
             </div>
         </div>

@@ -34,7 +34,7 @@ Payload:
 
 | Endpoint | HTTP Method | Authentication | Role | Response |
 |---|---|---|---|---|
-|/login|GET|Username and Password|Admin or User| JSON Web Token |
+|/login|POST|Username and Password|Admin or User| JSON Web Token |
 
 Payload:
 
@@ -93,11 +93,42 @@ Successful Response :
 }
 ```
 
+## Append To Form
+
+| Endpoint | HTTP Method | Authentication | Role | Response |
+|---|---|---|---|---|
+|/append_to_form|GET|JSON Web Token|Admin only| Request Status |
+
+Request Headers:
+
+``` json
+{
+"Content-Type": "application/json",
+"Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzQ5ODI0MDU4LCJleHAiOjE3NDk4MzEyNTh9.40YYMXjkrMguiOEx917ZNUkwlHY3fmTksuzY6zfcNQU"
+}
+```
+
+Payload:
+
+``` json
+{
+    "form_id":4,
+    "input_type":"text_label",
+    "form_item_value":"Hello"
+}
+```
+
+Successful Response :
+
+``` json
+{"Success":"Element appended to form"}
+```
+
 ## Get Form
 
 | Endpoint | HTTP Method | Authentication | Role | Response |
 |---|---|---|---|---|
-|/get_form|GET|JSON Web Token|Admin only| Request Status |
+|/get_form|GET|JSON Web Token|Admin only| Request Status and Form Details |
 
 Request Headers:
 
@@ -143,3 +174,29 @@ Successful Response :
     ]
 }
 ```
+
+## Get All Forms
+
+| Endpoint | HTTP Method | Authentication | Role | Response |
+|---|---|---|---|---|
+|/get_all_forms|GET|JSON Web Token|Admin only| Form Details |
+
+Request Headers:
+
+``` json
+{
+"Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzQ5ODI0MDU4LCJleHAiOjE3NDk4MzEyNTh9.40YYMXjkrMguiOEx917ZNUkwlHY3fmTksuzY6zfcNQU"
+}
+```
+
+Payload:
+
+None
+
+Successful Response :
+
+``` json
+[
+    {"id":1,"name":"SRM Placement","admin_id":1,"path":"123asd123"},
+    {"id":4,"name":"SRM2","admin_id":1,"path":"958ed2ac"}
+]

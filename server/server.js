@@ -1,3 +1,4 @@
+const cors = require('cors')
 const { urlencoded } = require('body-parser')
 const express = require('express')
 const http = require('http')
@@ -26,11 +27,17 @@ const app = express()
 const server = http.createServer(app)
 const io = socketIO(server)
 
+const corsOptions = {
+    origin: ['http://localhost:5173']
+};
+
+app.use(cors(corsOptions));
 app.use(express.json())
 app.use(urlencoded({ extended: true }))
 
 app.post('/register', async (req, res) => {
     const required_fields = ['username', 'password', 'role']
+    if (required_field_missing(required_fields, req.body, res)) return
 
     const hashed_password = generateSHA256(req.body.password)
 
@@ -44,12 +51,13 @@ app.post('/register', async (req, res) => {
     }
     if (error) {
         res.status(500).send({ "Interal Server Error": error })
+        return
     }
 
     res.status(200).send({ "Success": "User registered" })
 })
 
-app.get('/login', async (req, res) => {
+app.post('/login', async (req, res) => {
     const required_fields = ['username', 'password', 'role']
 
     if (required_field_missing(required_fields, req.body, res)) return
@@ -129,6 +137,11 @@ app.post('/append_to_form', async (req, res) => {
         form_item_user: 0
     })
 
+    if (error && error.code == '22P02') {
+        res.status(400).send({ "Bad Request": "Invalid Input Type" })
+        return
+    }
+
     if (error) {
         console.log(error)
         res.status(500).send({ "Internal Server Error": "Uncaught error occured" })
@@ -140,7 +153,7 @@ app.post('/append_to_form', async (req, res) => {
 
 app.get('/get_form', async (req, res) => {
     const required_fields = ['form_id'];
-    if (required_field_missing(required_fields, req.body, res)) return
+    if (required_field_missing(required_fields, req.query, res)) return
 
     const decodedObject = authenticate(req, res, secretKey)
 
@@ -151,7 +164,7 @@ app.get('/get_form', async (req, res) => {
         return
     }
 
-    var { data, error } = await client.from('forms').select().eq('id', req.body.form_id).eq('admin_id', decodedObject.id)
+    var { data, error } = await client.from('forms').select().eq('id', req.query.form_id).eq('admin_id', decodedObject.id)
 
     if (error) {
         console.log(error)
@@ -162,7 +175,7 @@ app.get('/get_form', async (req, res) => {
     console.log(data)
     let form_name = data[0].name
 
-    var { data, error } = await client.from('form_items').select().eq('form_id', req.body.form_id)
+    var { data, error } = await client.from('form_items').select().eq('form_id', req.query.form_id)
 
     if (error) {
         console.log(error)
@@ -194,7 +207,26 @@ app.get('/get_form', async (req, res) => {
     res.status(200).send(form_data)
 })
 
+app.get('/get_all_forms', async (req, res) => {
+    const decodedObject = authenticate(req, res, secretKey)
 
+    if (!decodedObject) return
+
+    if (decodedObject.role != 'admin') {
+        res.status(401).send({ "Unauthorized": "Permission Denied" })
+        return
+    }
+
+    const { data, error } = await client.from('forms').select().eq('admin_id', decodedObject.id)
+
+    if (error) {
+        console.log(error)
+        res.status(500).send({ "Internal Server Error": "Uncaught error occured" })
+        return
+    }
+
+    res.status(200).send(data)
+})
 
 server.listen(port, () => {
     console.log(`SERVER STARTED ON ${port}`)
