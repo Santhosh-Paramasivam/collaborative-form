@@ -1,41 +1,40 @@
-Designed with dbdiagram.io
-
-enum input_type {
-  text_label
-  text_input
-  number_input
-  dropdown_input
+Enum "input_type" {
+  "text_label"
+  "text_input"
+  "number_input"
+  "dropdown_input"
 }
 
-Table admins {
-  id integer [primary key]
-  username varchar
-  hashed_password varchar
+Table "admins" {
+  "id" SERIAL [pk, increment]
+  "username" varchar [unique]
+  "hashed_password" varchar
 }
 
-Table users {
-  id integer [primary key]
-  username varchar
-  hashed_password varchar
+Table "users" {
+  "id" SERIAL [pk, increment]
+  "username" varchar [unique]
+  "hashed_password" varchar
 }
 
-Table form_items {
-  id integer [primary key]
-  form_id integer
-  input_type input_type
-  form_item_value varchar
-  form_item_response varchar
-  form_item_user integer
+Table "form_items" {
+  "id" SERIAL [pk, increment]
+  "form_id" integer
+  "input_type" input_type
+  "form_item_value" "varchar[]"
+  "form_item_response" varchar
+  "form_item_user" integer
 }
 
-Table forms {
-  id integer [primary key]
-  admin_id integer
-  path varchar
+Table "forms" {
+  "id" SERIAL [pk, increment]
+  "name" varchar
+  "admin_id" integer
+  "path" varchar
 }
 
-Ref: "forms"."id" < "form_items"."form_id"
+Ref:"forms"."id" < "form_items"."form_id"
 
-Ref: "users"."id" < "form_items"."form_item_user"
+Ref:"users"."id" < "form_items"."form_item_user"
 
-Ref: "admins"."id" < "forms"."admin_id"
+Ref:"admins"."id" < "forms"."admin_id"
