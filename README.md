@@ -15,6 +15,7 @@ Since that is very unsafe, unfortunately my project cannot be run locally
 
 Instead, please do use the deployments given below :
 
+(Both links could have a latency of upto 60 secs initially as they are run on free tiers)
 [Frontend+Backend](https://collaborative-form-frontend.vercel.app/)
 [Only Backend](https://collaborative-form-soq1.onrender.com)
 
