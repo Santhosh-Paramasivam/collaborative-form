@@ -7,6 +7,17 @@ Submitted by
 - Department : CSE
 - College : SRM Institute of Science and Technology, Tiruchirappalli
 
+## Deployment
+
+The project relies on a remote supabase database and the only way the project can be made to run locally is for me to share the database credentials
+
+Since that is very unsafe, unfortunately my project cannot be run locally
+
+Instead, please do use the deployments given below :
+
+[Frontend+Backend](https://collaborative-form-frontend.vercel.app/)
+[Only Backend](https://collaborative-form-soq1.onrender.com)
+
 ## Tech Stack
 
 ### Node.js & Express.js
