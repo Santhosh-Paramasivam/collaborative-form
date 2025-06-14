@@ -1,0 +1,6 @@
+#main-page {
+    height: calc(100vh - 70px);
+    width: 100vw;
+    align-items: center;
+    align-content: center;
+}
