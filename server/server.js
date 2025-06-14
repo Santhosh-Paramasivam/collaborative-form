@@ -27,14 +27,14 @@ const server = http.createServer(app)
 
 const io = socketIO(server, {
     cors: {
-        origin: ['http://localhost:5173'],
+        origin: ['https://collaborative-form-frontend.vercel.app'],
         methods: ['GET', 'POST'],
         credentials: true
     }
 });
 
 const corsOptions = {
-    origin: ['http://localhost:5173']
+    origin: ['https://collaborative-form-frontend.vercel.app']
 };
 
 app.use(cors(corsOptions));
