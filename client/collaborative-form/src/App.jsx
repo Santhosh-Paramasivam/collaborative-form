@@ -14,6 +14,7 @@ function App() {
         <Route path='/login' element={<Login />}></Route>
         <Route path='/admin_dashboard' element={<AdminDashboard />}></Route>
         <Route path='/user_dashboard' element={<UserDashboard />}></Route>
+        <Route path='/forms/:form_path' element={<UserDashboard />}></Route>
       </Routes>
     </BrowserRouter>
   </div>

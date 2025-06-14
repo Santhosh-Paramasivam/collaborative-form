@@ -25,7 +25,14 @@ const client = supabase.createClient(supabaseUrl, supabaseKey)
 
 const app = express()
 const server = http.createServer(app)
-const io = socketIO(server)
+
+const io = socketIO(server, {
+    cors: {
+        origin: ['http://localhost:5173'],
+        methods: ['GET', 'POST'],
+        credentials: true
+    }
+});
 
 const corsOptions = {
     origin: ['http://localhost:5173']
@@ -226,6 +233,72 @@ app.get('/get_all_forms', async (req, res) => {
     }
 
     res.status(200).send(data)
+})
+
+app.get('/get_form_by_path', async (req, res) => {
+    const required_fields = ['form_path'];
+    if (required_field_missing(required_fields, req.query, res)) return
+
+    const decodedObject = authenticate(req, res, secretKey)
+
+    if (!decodedObject) return
+
+    if (decodedObject.role != 'admin') {
+        res.status(401).send({ "Unauthorized": "Permission Denied" })
+        return
+    }
+
+    var { data, error } = await client.from('forms').select().eq('path', req.query.form_path)
+
+    if (error) {
+        console.log(error)
+        res.status(500).send({ "Internal Server Error": "Uncaught error occured" })
+        return
+    }
+
+    console.log(data)
+    let form_name = data[0].name
+    let form_id = data[0].id
+
+    var { data, error } = await client.from('form_items').select().eq('form_id', form_id)
+
+    if (error) {
+        console.log(error)
+        res.status(500).send({ "Internal Server Error": "Uncaught error occured" })
+        return
+    }
+
+    let form_data = {
+        form_name: form_name
+    }
+
+    let form_items = []
+
+    for (let item of data) {
+        console.log(typeof (item.form_item_value))
+        form_items.push({
+            id: item.id,
+            input_type: item.input_type,
+            form_item_value: JSON.stringify(item.form_item_value),
+            form_item_response: item.form_item_response,
+            form_item_user: item.form_item_user
+        })
+    }
+
+    form_data['form_items'] = form_items
+
+    console.log(data)
+    console.log(form_data)
+
+    res.status(200).send(form_data)
+})
+
+io.on("connect", (socket) => {
+    socket.emit('locked', { form_element_id: 0 })
+
+    socket.on('disconnect', () => {
+        console.log('User disconnected');
+    });
 })
 
 server.listen(port, () => {
